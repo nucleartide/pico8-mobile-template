@@ -7,13 +7,24 @@
 // FilesToCache is a list of JavaScript files (served from your origin) that
 // will be cached on the user's device.
 const FilesToCache = [
-  // ...
+  '/app.js',
+  '/index.html',
+  '/app.css',
+  '/jelpi.js',
+  '/images/icon_128x128.png',
+  '/images/icon_144x144.png',
+  '/images/icon_152x152.png',
+  '/images/icon_192x192.png',
+  '/images/icon_256x256.png',
+  '/images/icon_32x32.png',
+  '/images/icon_512x512.png',
+  '/images/pico8_logo_vector.png',
 ];
 
 // CacheName is the identifier for your cache.
 // You should update this manually whenever any of the files in `FilesToCache`
 // change.
-const CacheName = "pico8-game-cache-v1";
+const CacheName = "pico8-game-cache-v2";
 
 /**
  * Service Worker event handlers.
