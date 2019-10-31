@@ -1,0 +1,40 @@
+body {
+  background-color: #222;
+  margin: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+#PlayButtonStyledInAppCSS {
+  /* Play button is an 80 pixel square that we want to center. */
+  top: -40px;
+  left: -40px;
+}
+
+#PlayButtonStyledInAppCSS:active {
+  /* When clicked, we nudge the play button down for visual feedback. */
+  top: -38px;
+  left: -40px;
+}
+
+#AddToHomeScreenStyledInAppCSS:active {
+  background-color: #222 !important;
+  color: white !important;
+}
+
+canvas {
+  image-rendering: optimizeSpeed;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: optimize-contrast;
+  image-rendering: pixelated;
+  -ms-interpolation-mode: nearest-neighbor;
+}
+
+html,
+body {
+  touch-action: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
+}

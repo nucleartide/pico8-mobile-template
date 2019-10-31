@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+
+    <!-- May need "user-scalable=no". -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <!-- Metadata for iOS. -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+    <meta name="apple-mobile-web-app-title" content="Weather PWA" />
+    <link rel="apple-touch-icon" href="/images/icon_152x152.png" />
+
+    <!-- Additional metadata to satisfy Lighthouse audit. -->
+    <meta name="description" content="This is an awesome PICO-8 game." />
+    <meta name="theme-color" content="#2F3BA2" />
+
+    <title>Document</title>
+    <link rel="stylesheet" href="./app.css" />
+    <link rel="manifest" href="./manifest.json" />
+  </head>
+  <body>
+    <!-- React. -->
+    <script
+      src="https://unpkg.com/react@16/umd/react.development.js"
+      crossorigin
+    ></script>
+    <script
+      src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"
+      crossorigin
+    ></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+    <!-- Your app. -->
+    <script type="text/babel" src="./app.js"></script>
+  </body>
+</html>
