@@ -51,7 +51,7 @@ The second point is especially important, as PICO-8 currently lacks export optio
 
 ### 1. Generate a new repository from this template
 
-> <a href="https://github.com/nucleartide/progressive_web_app/generate" target="_blank">Hold <kbd>Ctrl</kbd> (Windows) or <kbd>Command</kbd> (Mac), then click this link</a>
+> <a href="https://github.com/nucleartide/pico8-mobile-template/generate" target="_blank">Hold <kbd>Ctrl</kbd> (Windows) or <kbd>Command</kbd> (Mac), then click this link</a>
 
 <br />
 
