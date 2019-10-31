@@ -66,7 +66,8 @@ async function deleteStaleCaches() {
 async function handleFetch(req) {
   try {
     const cache = await caches.open(CacheName);
-    return cache.match(req.url);
+    const contents = await cache.match(req.url);
+    return contents
   } catch (err) {
     console.error("Failed to fetch from cache, trying network:", err);
     const res = await fetch(req);
