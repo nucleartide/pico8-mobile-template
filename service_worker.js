@@ -81,7 +81,10 @@ async function handleFetch(req) {
     if (!contents) throw new Error("Cache is empty.");
     return contents;
   } catch (err) {
-    console.error("Failed to fetch from cache, trying network. Error:", err);
+    console.error(
+      `Failed to fetch from cache for ${req.url}, trying network.`,
+      err
+    );
     const res = await fetch(req);
     return res;
   }
