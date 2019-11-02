@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://progressivewebapptest.jasontu.now.sh/"><img width="500" alt="PICO-8 on iOS" src="https://user-images.githubusercontent.com/914228/67862906-2dd40a00-fae0-11e9-832a-a592029f350f.png" ></a><br />
+  <a href="https://pico8-mobile-template.jasontu.now.sh"><img width="500" alt="PICO-8 on iOS" src="https://user-images.githubusercontent.com/914228/67862906-2dd40a00-fae0-11e9-832a-a592029f350f.png" ></a><br />
   ☝️ <strong><em>Press the image on mobile to try the demo</em></strong> ☝️
 </p>
 
