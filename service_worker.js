@@ -7,18 +7,18 @@
 // FilesToCache is a list of JavaScript files (served from your origin) that
 // will be cached on the user's device.
 const FilesToCache = [
-  '/app.js',
-  '/index.html',
-  '/app.css',
-  '/jelpi.js',
-  '/images/icon_128x128.png',
-  '/images/icon_144x144.png',
-  '/images/icon_152x152.png',
-  '/images/icon_192x192.png',
-  '/images/icon_256x256.png',
-  '/images/icon_32x32.png',
-  '/images/icon_512x512.png',
-  '/images/pico8_logo_vector.png',
+  "/app.js",
+  "/index.html",
+  "/app.css",
+  "/jelpi.js",
+  "/images/icon_128x128.png",
+  "/images/icon_144x144.png",
+  "/images/icon_152x152.png",
+  "/images/icon_192x192.png",
+  "/images/icon_256x256.png",
+  "/images/icon_32x32.png",
+  "/images/icon_512x512.png",
+  "/images/pico8_logo_vector.png"
 ];
 
 // CacheName is the identifier for your cache.
@@ -78,9 +78,10 @@ async function handleFetch(req) {
   try {
     const cache = await caches.open(CacheName);
     const contents = await cache.match(req.url);
-    return contents
+    if (!contents) throw new Error("Cache is empty.");
+    return contents;
   } catch (err) {
-    console.error("Failed to fetch from cache, trying network:", err);
+    console.error("Failed to fetch from cache, trying network. Error:", err);
     const res = await fetch(req);
     return res;
   }
