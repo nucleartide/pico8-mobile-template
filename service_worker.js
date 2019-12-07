@@ -19,7 +19,8 @@ const FilesToCache = [
   "/images/icon_256x256.png",
   "/images/icon_32x32.png",
   "/images/icon_512x512.png",
-  "/images/pico8_logo_vector.png"
+  "/images/pico8_logo_vector.png",
+  "/images/rotate.gif"
 ];
 
 // CacheName is the identifier for your cache.

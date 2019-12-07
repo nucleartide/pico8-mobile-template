@@ -22,6 +22,9 @@
     <link rel="manifest" href="./manifest.json" />
   </head>
   <body>
+    <!-- Necessary for itch.io -->
+    <canvas id="dummy4itchapp" style="position:absolute;visibility:hidden;width:0;height:0;"></canvas>
+
     <!-- React. -->
     <script
       src="https://unpkg.com/react@16/umd/react.development.js"
@@ -35,5 +38,14 @@
 
     <!-- Your app. -->
     <script type="text/babel" src="./app.js"></script>
+
+    <!-- Catches arrow key events to avoid scrolling the browser page -->
+    <script>
+      window.addEventListener("keydown", function(e) {
+       if([32, 37, 38, 39, 40].indexOf(e.keyCode) > -1) {
+       e.preventDefault();
+       }
+      }, false);
+    </script>
   </body>
 </html>

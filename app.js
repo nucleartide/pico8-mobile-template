@@ -41,6 +41,33 @@ const Module = {
   canvas: null
 };
 
+// Platform detection
+const getMobileDetect = userAgent => {
+  const isAndroid = () => Boolean(userAgent.match(/Android/i));
+  const isIos = () => Boolean(userAgent.match(/iPhone|iPad|iPod/i));
+  const isOpera = () => Boolean(userAgent.match(/Opera Mini/i));
+  const isWindows = () => Boolean(userAgent.match(/IEMobile/i));
+
+  const isMobile = () => Boolean(isAndroid() || isIos() || isOpera() || isWindows());
+  const isDesktop = () => !isMobile();
+  return {
+    isMobile,
+    isDesktop,
+    isAndroid,
+    isIos
+  };
+};
+
+const useMobileDetect = () => {
+  React.useEffect(() => {}, []);
+  return getMobileDetect(navigator.userAgent);
+};
+
+// Orientation detection
+function isOrientationPortrait() {
+  return (window.matchMedia("(orientation: portrait)")).matches;
+}
+
 /**
  * React components.
  */
@@ -119,6 +146,15 @@ function GameShell({ canvasIdentifier }) {
   const [isXPressed, setXPressed] = React.useState(false);
   const [isSoundOn, setSoundOn] = React.useState(true);
   const [isMenuOn, setMenuOn] = React.useState(false);
+  const [isControlsOn, setControlsOn] = React.useState(false);
+  const [isFullscreenOn, setFullscreenOn] = React.useState(false);
+  const [isPortrait, setPortrait] = React.useState(isOrientationPortrait());
+
+  React.useEffect(() => {
+    window.addEventListener("orientationchange", function() {
+      setPortrait(!isOrientationPortrait());
+    });
+  });
 
   return (
     <div
@@ -141,7 +177,7 @@ function GameShell({ canvasIdentifier }) {
         }}
       >
         <img alt="pico8" src="./images/pico8_logo_vector.png" width={100} />
-        <AnalogStick areaRadius={50} threshold={30} stickRadius={20} />
+        <AnalogStick areaRadius={50} threshold={30} stickRadius={20} isPortrait={isPortrait} />
       </div>
       <div
         style={{
@@ -179,6 +215,38 @@ function GameShell({ canvasIdentifier }) {
             alignItems: "center"
           }}
         >
+           <FullscreenMenu
+            isFullscreenOn={isFullscreenOn}
+            setFullscreenOn={isFullscreenOnNow => {
+              if (gameState !== GameState.Active) return;
+              var is_fullscreen=(document.fullscreenElement || document.mozFullScreenElement || document.webkitIsFullScreen || document.msFullscreenElement);
+              if (is_fullscreen)
+		          {
+                  if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.mozCancelFullScreen) {
+                        document.mozCancelFullScreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                       
+                    }
+                   
+                } else {
+		
+		            var el = document.getElementById(canvasIdentifier);
+		          if ( el.requestFullscreen ) {
+		            	el.requestFullscreen();
+		            } else if ( el.mozRequestFullScreen ) {
+		            	el.mozRequestFullScreen();
+		            } else if ( el.webkitRequestFullScreen ) {
+		              	el.webkitRequestFullScreen( Element.ALLOW_KEYBOARD_INPUT );
+                }
+              }
+              setFullscreenOn(is_fullscreen);
+            }}
+          />
           <SoundSwitch
             isSoundOn={isSoundOn}
             setSoundOn={isSoundOnNow => {
@@ -186,6 +254,7 @@ function GameShell({ canvasIdentifier }) {
               Module.pico8ToggleSound(isSoundOnNow);
               setSoundOn(isSoundOnNow);
             }}
+            isPortrait={isPortrait}
           />
           <HamburgerMenu
             isMenuOn={isMenuOn}
@@ -193,6 +262,16 @@ function GameShell({ canvasIdentifier }) {
               if (gameState !== GameState.Active) return;
               Module.pico8TogglePaused(isMenuOnNow);
               setMenuOn(isMenuOnNow);
+            }}
+            isPortrait={isPortrait}
+            style={{ marginTop: 8 }}
+          />
+          <ControlsMenu
+            isControlsOn={isControlsOn}
+            setControlsOn={isControlsOnNow => {
+              if (gameState !== GameState.Active) return;
+              Module.pico8ToggleControlMenu(isControlsOnNow);
+              setControlsOn(isControlsOnNow);
             }}
             style={{ marginTop: 8 }}
           />
@@ -215,6 +294,7 @@ function GameShell({ canvasIdentifier }) {
               position: "relative",
               top: 20
             }}
+            isPortrait={isPortrait}
           />
           <OButton
             isPressed={isOPressed}
@@ -225,6 +305,7 @@ function GameShell({ canvasIdentifier }) {
             style={{
               marginLeft: 10
             }}
+            isPortrait={isPortrait}
           />
         </div>
       </div>
@@ -238,6 +319,7 @@ function GameShell({ canvasIdentifier }) {
             // Update game state.
             setGameState(GameState.Loading);
           }}
+          isPortrait={isPortrait}
         />
       )}
     </div>
@@ -245,12 +327,18 @@ function GameShell({ canvasIdentifier }) {
 }
 
 // <PlayButton /> displays the standard PICO-8 play button.
-function PlayButton({ style, onClick }) {
+function PlayButton({ style, onClick, isPortrait }) {
   if (!onClick) {
     throw new Error(`<PlayButton /> requires an onClick property.`);
   }
 
-  return (
+  return ( isPortrait && useMobileDetect().isMobile() ? (
+    <img
+    alt="rotate phone"
+    src="images/rotate.gif"
+    style={{ position: "absolute" }}
+    />
+    ) : (
     <div
       style={{
         display: "flex",
@@ -270,7 +358,7 @@ function PlayButton({ style, onClick }) {
         />
       </div>
     </div>
-  );
+  ));
 }
 
 // <Game /> contains the actual PICO-8 game.
@@ -320,11 +408,12 @@ function Game({ gameState, setGameState, canvasIdentifier }) {
 }
 
 // <SoundSwitch /> toggles PICO-8's sound on or off.
-function SoundSwitch({ isSoundOn, setSoundOn }) {
+function SoundSwitch({ isSoundOn, setSoundOn, isPortrait }) {
   if (!setSoundOn) {
     throw new Error("<SoundSwitch /> requires a setSoundOn callback.");
   }
 
+  if (useMobileDetect().isDesktop() || !isPortrait) {
   return (
     <div
       style={{
@@ -332,12 +421,20 @@ function SoundSwitch({ isSoundOn, setSoundOn }) {
         alignItems: "center",
         height: 32,
         alignSelf: "stretch",
-        justifyContent: "center"
+        justifyContent: "center",
       }}
       onClick={() => {
         setSoundOn(!isSoundOn);
       }}
     >
+      <div
+        style={{
+          height: 24,
+          width: 24,
+          overflow: "hidden",
+          position: "relative",
+          left: 2
+        }}>
       {isSoundOn ? (
         <img
           alt="sound on"
@@ -349,28 +446,19 @@ function SoundSwitch({ isSoundOn, setSoundOn }) {
           src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAANklEQVRIx2NgGDHg/8cX/5Hx0LEA3cChYwEugwavBcRG4qgFoxYMZwuGfk4efqXp8KnRBj0AAMz7cLDnG4FeAAAAAElFTkSuQmCC"
         />
       )}
-      <span
-        style={{
-          fontFamily: "sans-serif",
-          color: "white",
-          fontSize: "0.6rem",
-          textTransform: "uppercase",
-          display: "inline-block",
-          marginLeft: 8
-        }}
-      >
-        {isSoundOn ? "Sound On" : "Sound Off"}
-      </span>
-    </div>
+    </div></div>
   );
+  }
+  return null;
 }
 
 // <HamburgerMenu /> toggles PICO-8's menu on or off.
-function HamburgerMenu({ isMenuOn, setMenuOn, style }) {
+function HamburgerMenu({ isMenuOn, setMenuOn, isPortrait, style }) {
   if (!setMenuOn) {
     throw new Error("<HamburgerMenu /> requires an `setMenuOn` property.");
   }
-
+ 
+  if (useMobileDetect().isMobile() && !isPortrait) {
   return (
     <div
       style={{
@@ -390,7 +478,8 @@ function HamburgerMenu({ isMenuOn, setMenuOn, style }) {
           height: 10,
           width: 24,
           overflow: "hidden",
-          position: "relative"
+          position: "relative",
+          left: 2
         }}
       >
         <img
@@ -399,27 +488,101 @@ function HamburgerMenu({ isMenuOn, setMenuOn, style }) {
           style={{ position: "absolute", transform: "rotate(90deg)", top: -2 }}
         />
       </div>
-      <span
-        style={{
-          fontFamily: "sans-serif",
-          color: "white",
-          fontSize: "0.6rem",
-          textTransform: "uppercase",
-          display: "inline-block",
-          marginLeft: 8
-        }}
-      >
-        {isMenuOn ? "menu on" : "menu off"}
-      </span>
     </div>
   );
+  }
+  return null;
+}
+
+// <ControlsMenu /> toggles overlay of PICO-8 controls on or off.
+function ControlsMenu({ isControlsOn, setControlsOn, style }) {
+  if (!setControlsOn) {
+    throw new Error("<ControlsMenu /> requires an `setControlsOn` property.");
+  }
+
+  if(useMobileDetect().isDesktop()) {
+  return ( 
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        height: 64,
+        alignSelf: "stretch",
+        justifyContent: "center",
+        ...style
+      }}
+      onClick={() => {
+        setControlsOn(!isControlsOn);
+      }}
+    >
+      <div
+        style={{
+          height: 24,
+          width: 24,
+          overflow: "hidden",
+          position: "relative",
+          left: 2
+        }}
+      >
+        <img
+          alt="toggle controls"
+          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAQ0lEQVRIx2NgGAXEgP8fX/ynBaap4XBLhqcF1IyfYWQBrZLz0LEAlzqqxQFVLcAmT3MLqJqTaW7B4CqLaF4fjIIBBwBL/B2vqtPVIwAAAABJRU5ErkJggg=="
+          style={{ position: "absolute", top: -2 }}
+        />
+      </div>
+    </div>
+    ); 
+  }
+  return null;
+}
+
+// <FullscreenMenu /> toggles fullscreen mode on or off.
+function FullscreenMenu({ isFullscreenOn, setFullscreenOn, style }) {
+  if (!setFullscreenOn) {
+    throw new Error("<FullscreenMenu /> requires an `setFullscreenOn` property.");
+
+  }
+  if(useMobileDetect().isDesktop()) {
+  return (  
+    <div
+      style={{
+        display: "flex",
+        alignItems: "center",
+        height: 64,
+        alignSelf: "stretch",
+        justifyContent: "center",
+        ...style
+      }}
+      onClick={() => {
+        setFullscreenOn(!isFullscreenOn);
+      }}
+    >
+      <div
+        style={{
+          height: 24,
+          width: 24,
+          overflow: "hidden",
+          position: "relative",
+          left: 2
+        }}
+      >
+        <img
+          alt="toggle fullscreen"
+          src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAYAAADgdz34AAAAN0lEQVRIx2NgGPLg/8cX/2mJ6WcBrUJm4CwgOSgGrQVEB8WoBaMWDGMLhm5OHnql6dCt0YY8AAA9oZm+9Z9xQAAAAABJRU5ErkJggg=="
+          style={{ position: "absolute", top: -2 }}
+        />
+      </div>
+    </div>
+    );
+  }
+  return null;
 }
 
 // <AnalogStick /> simulates an analog touch input that controls PICO-8.
 // areaRadius defines the radius (in pixels) of the analog stick's area.
 // threshold defines the threshold radius (in pixels) at which a direction button becomes pressed.
 // stickRadius defines the display radius (in pixels) of stick itself.
-function AnalogStick({ areaRadius, threshold, stickRadius }) {
+function AnalogStick({ areaRadius, threshold, stickRadius, isPortrait }) {
   if (!areaRadius)
     throw new Error(`<AnalogStick /> requires an areaRadius property.`);
   if (!threshold)
@@ -495,6 +658,7 @@ function AnalogStick({ areaRadius, threshold, stickRadius }) {
     }
   };
 
+  if (useMobileDetect().isMobile() && !isPortrait) {
   return (
     <div
       style={{
@@ -535,6 +699,8 @@ function AnalogStick({ areaRadius, threshold, stickRadius }) {
       />
     </div>
   );
+  }
+  return null;
 }
 
 const ButtonStyles = {
@@ -550,22 +716,31 @@ const ButtonStyles = {
   fontWeight: 100
 };
 
+const XButtonStyles = {
+  backgroundColor: "blue",
+}
+
+const OButtonStyles = {
+  backgroundColor: "green",
+}
+
 const ActiveStyles = {
   backgroundColor: "white",
   color: "#222"
 };
 
 // <OButton /> controls PICO-8's 'O' button state.
-function OButton({ isPressed, setPressed, style: customStyle }) {
+function OButton({ isPressed, setPressed, isPortrait, style: customStyle }) {
   if (isPressed === undefined)
     throw new Error("<OButton /> is missing an `isPressed` property.");
   if (!setPressed)
     throw new Error("<OButton /> is missing a `setPressed` property.");
 
-  const style = isPressed
-    ? { ...ButtonStyles, ...ActiveStyles }
-    : { ...ButtonStyles };
+    const style = isPressed
+    ? { ...ButtonStyles, ...OButtonStyles, ...ActiveStyles }
+    : { ...ButtonStyles, ...OButtonStyles };
 
+  if (useMobileDetect().isMobile() && !isPortrait) {
   return (
     <div
       style={{ ...style, ...customStyle }}
@@ -574,23 +749,25 @@ function OButton({ isPressed, setPressed, style: customStyle }) {
       onTouchEnd={() => setPressed(false)}
       onTouchCancel={() => setPressed(false)}
     >
-      O
     </div>
   );
+  }
+  return null;
 }
 
 // <XButton /> controls PICO-8's 'X' button state.
-function XButton({ isPressed, setPressed, style: customStyle }) {
+function XButton({ isPressed, setPressed, isPortrait, style: customStyle }) {
   if (isPressed === undefined)
     throw new Error("<XButton /> is missing an `isPressed` property.");
   if (!setPressed)
     throw new Error("<XButton /> is missing a `setPressed` property.");
 
-  const style = isPressed
-    ? { ...ButtonStyles, ...ActiveStyles }
-    : { ...ButtonStyles };
-
-  return (
+    const style = isPressed
+    ? { ...ButtonStyles, ...XButtonStyles, ...ActiveStyles }
+    : { ...ButtonStyles, ...XButtonStyles };
+  
+    if (useMobileDetect().isMobile() && !isPortrait) {
+    return (
     <div
       style={{ ...style, ...customStyle }}
       onContextMenu={e => e.preventDefault()}
@@ -598,9 +775,10 @@ function XButton({ isPressed, setPressed, style: customStyle }) {
       onTouchEnd={() => setPressed(false)}
       onTouchCancel={() => setPressed(false)}
     >
-      X
     </div>
   );
+  }
+  return null;
 }
 
 /**
