@@ -6,6 +6,11 @@ body {
   overflow: hidden;
 }
 
+#RotatePhoneIcon {
+  top: -180px;
+  left: -180px;
+}
+
 #PlayButtonStyledInAppCSS {
   /* Play button is an 80 pixel square that we want to center. */
   top: -40px;
