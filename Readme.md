@@ -223,4 +223,6 @@ As of this writing, I work at [**@segment**](https://github.com/segmentio) by da
 
 For more quips about PICO-8, please follow me on Twitter at [**@nucleartide**](https://twitter.com/nucleartide).
 
-If you found this repository to be useful, feel free to show your appreciation by [buying me a coffee](https://ko-fi.com/nucleartide). ☕ (Or hit that "Sponsor" button at the top of the page.) I love coffee, yo.
+---
+
+> Team Avocado: https://teamavocado.co/
